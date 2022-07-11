@@ -85,6 +85,9 @@ open class EachNavigationBar: UINavigationBar {
         }
     }
     
+    // 记录当 isTranslucent 设置为true时，bar.backgroundEffect的值
+    private var backgroundEffect: UIBlurEffect?
+    
     open var shadow: Shadow = .none {
         willSet { changed.insert(\.shadow) }
         didSet { layer.apply(shadow) }
@@ -139,10 +142,16 @@ extension EachNavigationBar {
             changed.insert(\.isTranslucent)
         }
         didSet {
-            guard #available(iOS 13.0, *), !isTranslucent else { return }
+            guard #available(iOS 13.0, *) else { return }
             
-            appearance.backgroundEffect = nil
-            updateAppearance(appearance)
+            if isTranslucent {
+                backgroundEffect = appearance.backgroundEffect
+                appearance.backgroundEffect = nil
+                updateAppearance(appearance)
+            } else {
+                appearance.backgroundEffect = backgroundEffect
+                updateAppearance(appearance)
+            }
         }
     }
     
